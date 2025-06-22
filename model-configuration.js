@@ -146,6 +146,10 @@ function handleProviderChange(event) {
     if (imageCapabilityInput) {
         imageCapabilityInput.value = 'false';
     }
+    
+    // Auto-save configuration
+    // 自动保存配置
+    saveConfiguration();
 }
 
 // Handle Model change
@@ -181,12 +185,20 @@ function handleModelChange(event) {
             imageCapabilityInput.value = 'false';
         }
     }
+    
+    // Auto-save configuration
+    // 自动保存配置
+    saveConfiguration();
 }
 
 // Handle API URL change
 function handleApiUrlChange(event) {
     currentConfig.apiUrl = event.target.value;
     console.log('[ModelConfig] 🔗 API URL updated:', currentConfig.apiUrl);
+    
+    // Auto-save configuration
+    // 自动保存配置
+    saveConfiguration();
 }
 
 // Handle API Key change
@@ -195,18 +207,30 @@ function handleApiKeyChange(event) {
     const maskedKey = currentConfig.apiKey.length > 6 ? 
         currentConfig.apiKey.substring(0, 6) + '...' : currentConfig.apiKey;
     console.log('[ModelConfig] 🔑 API Key updated (first 6 chars):', maskedKey);
+    
+    // Auto-save configuration
+    // 自动保存配置
+    saveConfiguration();
 }
 
 // Handle Max Tokens change
 function handleMaxTokensChange(event) {
     currentConfig.maxTokens = parseInt(event.target.value) || 1000;
     console.log('[ModelConfig] 🔢 Max Tokens updated:', currentConfig.maxTokens);
+    
+    // Auto-save configuration
+    // 自动保存配置
+    saveConfiguration();
 }
 
 // Handle Temperature change
 function handleTemperatureChange(event) {
     currentConfig.temperature = parseFloat(event.target.value) || 0.3;
     console.log('[ModelConfig] 🌡️ Temperature updated:', currentConfig.temperature);
+    
+    // Auto-save configuration
+    // 自动保存配置
+    saveConfiguration();
 }
 
 // Handle Save & Test button click
