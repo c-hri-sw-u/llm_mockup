@@ -386,7 +386,7 @@ function addSelection() {
     div.innerHTML = `
         <label>SELECTION ${count}:</label>
         <input type="text" class="modal-input selection-option" value="Input" placeholder="Input">
-        <button type="button" class="btn-add" onclick="removeSelection(this)">+</button>
+        <button type="button" class="btn-add" onclick="removeSelection(this)">-</button>
     `;
     container.appendChild(div);
 }
