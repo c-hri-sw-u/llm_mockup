@@ -26,7 +26,7 @@ body {
     align-items: flex-start;
     margin-bottom: 10px;
     gap: 20px;
-    margin-top: 50px;
+    margin-top: 40px;
 }
 
 .top-buttons-header h3 {
@@ -36,12 +36,20 @@ body {
     margin-top: 8px;
 }
 
+.prompt-buttons-header {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
+}
 
 .top-buttons {
     display: flex;
     gap: 8px;
-
-
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: flex-start;
 }
 
 .btn {
@@ -130,7 +138,7 @@ body {
 
 .main-textarea {
     width: 100%;
-    height: 200px;
+    height: 300px;
     padding: 15px;
     border: 1px solid #ddd;
     border-radius: 4px;
@@ -251,7 +259,7 @@ body {
 .prompt-section {
     display: flex;
     flex-direction: column;
-    margin-bottom: 50px;
+    margin-bottom: 40px;
 }
 
 .prompt-header {

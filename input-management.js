@@ -102,12 +102,6 @@ class InputManager {
     // 显示导入弹窗
     showImportModal() {
         const savedInputs = this.getSavedInputs();
-        
-        if (savedInputs.length === 0) {
-            this.showMessage('No saved inputs found / 未找到保存的输入', 'info');
-            return;
-        }
-
         this.createImportModal(savedInputs);
     }
 
@@ -145,34 +139,51 @@ class InputManager {
         const body = document.createElement('div');
         body.className = 'modal-body import-modal-body';
 
-        // Create list of saved inputs
-        // 创建保存输入的列表
-        savedInputs.forEach((input, index) => {
-            const inputItem = document.createElement('div');
-            inputItem.className = 'saved-input-item';
-            
-            const date = new Date(input.timestamp);
-            const formattedDate = date.toLocaleString();
-            
-            inputItem.innerHTML = `
-                <div class="saved-input-preview">${input.preview}</div>
-                <div class="saved-input-meta">
-                    <span class="saved-input-date">${formattedDate}</span>
-                    <div class="saved-input-actions">
-                        <button class="btn-small load-btn" onclick="window.inputManager.loadInput(${input.id})">LOAD</button>
-                        <button class="btn-small delete-btn" onclick="window.inputManager.deleteSavedInput(${input.id})">DELETE</button>
-                    </div>
-                </div>
+        if (savedInputs.length === 0) {
+            // Show empty state message
+            // 显示空状态消息
+            const emptyMessage = document.createElement('div');
+            emptyMessage.className = 'empty-state-message';
+            emptyMessage.style.cssText = `
+                text-align: center;
+                padding: 40px 20px;
+                color: #666;
+                font-style: italic;
             `;
-            
-            body.appendChild(inputItem);
-        });
+            emptyMessage.textContent = 'No saved inputs yet / 暂无保存的输入';
+            body.appendChild(emptyMessage);
+        } else {
+            // Create list of saved inputs
+            // 创建保存输入的列表
+            savedInputs.forEach((input, index) => {
+                const inputItem = document.createElement('div');
+                inputItem.className = 'saved-input-item';
+                
+                const date = new Date(input.timestamp);
+                const formattedDate = date.toLocaleString();
+                
+                inputItem.innerHTML = `
+                    <div class="saved-input-preview">${input.preview}</div>
+                    <div class="saved-input-meta">
+                        <span class="saved-input-date">${formattedDate}</span>
+                        <div class="saved-input-actions">
+                            <button class="btn-small load-btn" onclick="window.inputManager.loadInput(${input.id})">LOAD</button>
+                            <button class="btn-small delete-btn" onclick="window.inputManager.deleteSavedInput(${input.id})">DELETE</button>
+                        </div>
+                    </div>
+                `;
+                
+                body.appendChild(inputItem);
+            });
+        }
 
         // Modal footer
         // 弹窗底部
         const footer = document.createElement('div');
         footer.className = 'modal-footer';
         footer.innerHTML = `
+            <button class="btn-small" onclick="window.inputManager.saveAsFile()">SAVE AS FILE</button>
+            <button class="btn-small" onclick="window.inputManager.importFromFile()">IMPORT FROM LOCAL</button>
             <button class="btn-small" onclick="window.inputManager.clearAllInputs()">CLEAR ALL</button>
             <button class="btn-small" onclick="document.getElementById('import-modal').remove()">CLOSE</button>
         `;
@@ -254,22 +265,120 @@ class InputManager {
     // Clear all saved inputs
     // 清除所有保存的输入
     clearAllInputs() {
+        const savedInputs = this.getSavedInputs();
+        if (savedInputs.length === 0) {
+            this.showMessage('No inputs to clear / 没有输入需要清除', 'info');
+            return;
+        }
+        
         if (confirm('Are you sure you want to delete all saved inputs? / 确定要删除所有保存的输入吗？')) {
             try {
                 localStorage.setItem(this.storageKey, JSON.stringify([]));
                 this.showMessage('All inputs cleared / 所有输入已清除', 'success');
                 
-                // Close modal
-                // 关闭弹窗
-                const modal = document.getElementById('import-modal');
-                if (modal) {
-                    modal.remove();
-                }
+                // Refresh modal to show empty state
+                // 刷新弹窗显示空状态
+                this.showImportModal();
             } catch (error) {
                 console.error('Error clearing inputs:', error);
                 this.showMessage('Failed to clear inputs / 清除输入失败', 'error');
             }
         }
+    }
+
+    // Save inputs as file
+    // 将输入保存为文件
+    saveAsFile() {
+        const savedInputs = this.getSavedInputs();
+        
+        const exportData = {
+            type: 'input-data',
+            version: '1.0',
+            exportDate: new Date().toISOString(),
+            data: savedInputs
+        };
+        
+        const dataStr = JSON.stringify(exportData, null, 2);
+        const dataBlob = new Blob([dataStr], { type: 'application/json' });
+        
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(dataBlob);
+        link.download = `inputs_export_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.json`;
+        link.click();
+        
+        this.showMessage('Inputs exported successfully / 输入导出成功', 'success');
+    }
+
+    // Import inputs from file
+    // 从文件导入输入
+    importFromFile() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json';
+        input.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const importData = JSON.parse(e.target.result);
+                    
+                    // Validate file type
+                    // 验证文件类型
+                    if (importData.type !== 'input-data') {
+                        if (importData.type === 'configuration-data') {
+                            this.showMessage('Error: This is a configuration file, not an input file / 错误：这是配置文件，不是输入文件', 'error');
+                        } else {
+                            this.showMessage('Error: Invalid file format / 错误：无效的文件格式', 'error');
+                        }
+                        return;
+                    }
+                    
+                    if (!Array.isArray(importData.data)) {
+                        this.showMessage('Error: Invalid data format / 错误：无效的数据格式', 'error');
+                        return;
+                    }
+                    
+                    // Merge with existing data
+                    // 与现有数据合并
+                    const existingInputs = this.getSavedInputs();
+                    const mergedInputs = [...importData.data, ...existingInputs];
+                    
+                    // Remove duplicates based on content
+                    // 基于内容去除重复项
+                    const uniqueInputs = [];
+                    const seenContents = new Set();
+                    
+                    for (const input of mergedInputs) {
+                        if (!seenContents.has(input.content)) {
+                            seenContents.add(input.content);
+                            uniqueInputs.push(input);
+                        }
+                    }
+                    
+                    // Keep only the most recent items
+                    // 只保留最新的条目
+                    const finalInputs = uniqueInputs.slice(0, this.maxSavedItems);
+                    
+                    // Save to localStorage
+                    // 保存到localStorage
+                    localStorage.setItem(this.storageKey, JSON.stringify(finalInputs));
+                    
+                    this.showMessage(`Imported ${importData.data.length} inputs successfully / 成功导入${importData.data.length}个输入`, 'success');
+                    
+                    // Refresh modal
+                    // 刷新弹窗
+                    this.showImportModal();
+                    
+                } catch (error) {
+                    console.error('Error importing inputs:', error);
+                    this.showMessage('Error: Failed to parse file / 错误：解析文件失败', 'error');
+                }
+            };
+            reader.readAsText(file);
+        });
+        input.click();
     }
 
     // Show message
