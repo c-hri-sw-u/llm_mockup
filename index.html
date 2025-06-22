@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Text Generator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Top buttons -->
+        <div class="top-buttons-header">
+            <h3>INPUT ITEMS</h3>
+            <div class="top-buttons">
+                <button class="btn" onclick="openAddModal('selection')">ADD SELECTION</button>
+                <button class="btn" onclick="openAddModal('input')">ADD INPUT</button>
+                <button class="btn" onclick="openAddModal('image')">ADD IMAGE</button>
+            </div>
+        </div>
+        
+        <!-- Form inputs -->
+        <div class="form-inputs" id="form-inputs">
+            <!-- Dynamic input items will be added here -->
+        </div>
+        
+        <!-- Divider -->
+        <div class="divider"></div>
+        
+        <!-- Main content area -->
+        <div class="main-content">
+            <!-- Input section -->
+            <div class="input-section">
+                <h3>INPUT</h3>
+                <textarea class="main-textarea" placeholder="Input"></textarea>
+                <div class="section-footer">
+                    <span class="word-count">WORDS COUNT: <span id="input-count">0</span></span>
+                    <div class="input-buttons">
+                        <button class="btn-small" id="save-input-btn">SAVE</button>
+                        <button class="btn-small" id="import-input-btn">IMPORT</button>
+                        <!-- <button class="btn-small" id="voice-input-btn">VOICE INPUT</button> -->
+                        <button class="btn-small" id="ok-btn">► OK</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Output section -->
+            <div class="output-section">
+                <h3>OUTPUT</h3>
+                <textarea class="main-textarea" placeholder="Output will appear here" readonly></textarea>
+                <div class="section-footer">
+                    <span class="word-count">WORDS COUNT: <span id="output-count">0</span></span>
+                    <div class="output-buttons">
+                        <button class="btn-small" id="save-config-btn">SAVE CONFIGURATION</button>
+                        <button class="btn-small" id="import-config-btn">IMPORT</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Divider -->
+        <div class="divider"></div>
+        
+        <!-- Bottom section -->
+        <div class="bottom-section">
+            <!-- Model Configuration -->
+            <div class="model-config">
+                <div class="model-config-header">
+                    <h3>MODEL CONFIGURATION</h3>
+                    <button class="btn-small">SAVE & TEST</button>
+                </div>
+                <div class="config-grid">
+                    <div class="config-item">
+                        <label>PROVIDER:</label>
+                        <select class="config-select">
+                            <option>None</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label>MODEL:</label>
+                        <select class="config-select">
+                            <option>None</option>
+                        </select>
+                    </div>
+                    <div class="config-item">
+                        <label>API URL:</label>
+                        <input type="text" class="config-input" id="api-url" placeholder="Input">
+                    </div>
+                    <div class="config-item">
+                        <label>API KEY:</label>
+                        <input type="text" class="config-input" id="api-key" placeholder="Input">
+                    </div>
+                    <div class="config-item">
+                        <label>MAX TOKEN:</label>
+                        <input type="text" class="config-input" value="1000">
+                    </div>
+                    <div class="config-item">
+                        <label>TEMPERATURE:</label>
+                        <input type="text" class="config-input" value="0.3">
+                    </div>
+                    <div class="config-item">
+                        <label>IMAGE CAPABILITY:</label>
+                        <input type="text" class="config-input" id="image-capability" value="false" readonly>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prompt section -->
+            <div class="prompt-section">
+                <div class="prompt-header">
+                    <h3>PROMPT</h3>
+                    <div class="prompt-buttons-header" id="prompt-buttons-header">
+                        <button class="btn-small" onclick="insertPromptVariable('input_box')">+ input_box</button>
+                    </div>
+                </div>
+                <textarea class="prompt-textarea" placeholder="Input"></textarea>
+                <div class="prompt-footer">
+                    <span class="word-count">WORDS COUNT: <span id="prompt-count">0</span> | IMG: <span id="img-count">0</span></span>
+                    <div class="prompt-buttons">
+                        <button class="btn-small" id="copy-btn">COPY</button>
+                        <!-- <button class="btn-small" id="paste-btn">PASTE</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for adding/editing input items -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">ADD TOGGLE</h3>
+            </div>
+            <div class="modal-body" id="modal-body">
+                <!-- Dynamic content will be added here -->
+            </div>
+            <div class="modal-footer">
+                <button class="btn-delete" id="delete-btn" onclick="deleteInputItem()">DELETE</button>
+                <button class="btn-save" onclick="saveInputItem()">SAVE</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="form-inputs.js"></script>
+    <script src="prompt-textarea.js"></script>
+    <script src="model-configuration.js"></script>
+    <script src="run-model.js"></script>
+    <script src="input-management.js"></script>
+    <script src="voice-input.js"></script>
+    <script src="configuration-management.js"></script>
+</body>
+</html> 
