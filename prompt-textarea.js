@@ -3,6 +3,10 @@ let isFoldMode = true; // true = fold mode (show {{}}), false = unfold mode (sho
 let originalPromptText = ''; // Store the original text with {{}}
 let promptInitialized = false; // Flag to track if prompt textarea has been initialized
 
+// Make originalPromptText globally accessible for configuration management
+// 使originalPromptText全局可访问以便配置管理
+window.originalPromptText = originalPromptText;
+
 document.addEventListener('DOMContentLoaded', function() {
     setupPromptTextarea();
 });
@@ -15,9 +19,11 @@ function setupPromptTextarea() {
     if (savedPromptText) {
         promptTextarea.value = savedPromptText;
         originalPromptText = savedPromptText;
+        window.originalPromptText = originalPromptText; // Keep global reference updated
     } else {
         // Initialize original text
         originalPromptText = promptTextarea.value;
+        window.originalPromptText = originalPromptText; // Keep global reference updated
     }
     
     // Store original text when user types
@@ -25,6 +31,7 @@ function setupPromptTextarea() {
         // Only process input in fold mode
         if (isFoldMode) {
             originalPromptText = this.value;
+            window.originalPromptText = originalPromptText; // Keep global reference updated
             updateDisplayAndWordCount();
             // Save to localStorage
             localStorage.setItem('promptText', this.value);
@@ -289,6 +296,7 @@ function toggleFoldMode() {
         isFoldMode = false;
         foldButton.textContent = 'FOLD';
         originalPromptText = promptTextarea.value; // Save current text
+        window.originalPromptText = originalPromptText; // Keep global reference updated
     } else {
         // Switch to fold mode
         isFoldMode = true;
@@ -459,6 +467,7 @@ function updatePromptWordCount() {
             // This prevents overwriting saved content during initialization
             if (promptTextarea.value || !originalPromptText) {
                 originalPromptText = promptTextarea.value;
+                window.originalPromptText = originalPromptText; // Keep global reference updated
                 // Save to localStorage only if there's actual content
                 if (promptTextarea.value) {
                     localStorage.setItem('promptText', promptTextarea.value);

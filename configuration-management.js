@@ -41,29 +41,28 @@ class ConfigurationManager {
             inputItems = [...window.inputItems];
         }
         
-        // Get model configuration
-        // 获取模型配置
-        const modelConfig = window.ModelConfiguration ? 
+        // Get model configuration (exclude API key for security)
+        // 获取模型配置（排除API key以确保安全）
+        const originalModelConfig = window.ModelConfiguration ? 
             window.ModelConfiguration.getCurrentConfig() : {};
+        const modelConfig = { ...originalModelConfig };
+        delete modelConfig.apiKey; // Remove API key from saved configuration
         
         // Get prompt text
         // 获取提示文本
         const promptTextarea = document.querySelector('.prompt-textarea');
         const promptText = promptTextarea ? promptTextarea.value : '';
         
-        // Get input and output text
-        // 获取输入和输出文本
-        const inputTextarea = document.querySelector('.input-section .main-textarea');
+        // Get output text (exclude input text as it will be saved separately)
+        // 获取输出文本（排除输入文本，因为它会单独保存）
         const outputTextarea = document.querySelector('.output-section .main-textarea');
-        const inputText = inputTextarea ? inputTextarea.value : '';
         const outputText = outputTextarea ? outputTextarea.value : '';
         
         return {
             inputItems,
             modelConfig,
             promptText,
-            inputText,
-            outputText,
+            outputText, // Removed inputText
             timestamp: new Date().toISOString(),
             version: '1.0'
         };
@@ -152,6 +151,8 @@ class ConfigurationManager {
         try {
             // Simple comparison - check if key properties are the same
             // 简单比较 - 检查关键属性是否相同
+            // Note: inputText and apiKey are excluded from saved configurations
+            // 注意：inputText和apiKey已从保存的配置中排除
             return (
                 JSON.stringify(config1.inputItems) === JSON.stringify(config2.inputItems) &&
                 config1.promptText === config2.promptText &&
@@ -436,6 +437,8 @@ class ConfigurationManager {
                     const seenConfigs = new Set();
                     
                     for (const config of mergedConfigs) {
+                        // Create config key for duplicate detection (excludes inputText and apiKey)
+                        // 创建配置键值用于重复检测（排除inputText和apiKey）
                         const configKey = JSON.stringify({
                             inputItems: config.config.inputItems,
                             promptText: config.config.promptText,
@@ -519,6 +522,12 @@ class ConfigurationManager {
                 // 更新model-configuration.js中的currentConfig
                 Object.assign(window.ModelConfiguration.getCurrentConfig(), config.modelConfig);
                 
+                // Save the updated configuration to localStorage
+                // 将更新的配置保存到localStorage
+                if (typeof window.ModelConfiguration.saveConfig === 'function') {
+                    window.ModelConfiguration.saveConfig();
+                }
+                
                 // Update UI
                 // 更新UI
                 this.updateModelConfigurationUI(config.modelConfig);
@@ -531,6 +540,12 @@ class ConfigurationManager {
                 if (promptTextarea) {
                     promptTextarea.value = config.promptText;
                     localStorage.setItem('promptText', config.promptText);
+                    
+                    // Update originalPromptText in prompt-textarea.js to ensure consistency
+                    // 更新prompt-textarea.js中的originalPromptText以确保一致性
+                    if (typeof window.originalPromptText !== 'undefined') {
+                        window.originalPromptText = config.promptText;
+                    }
                 }
                 
                 // Update prompt word count
@@ -540,19 +555,8 @@ class ConfigurationManager {
                 }
             }
             
-            // Load input and output text
-            // 加载输入和输出文本
-            if (config.inputText !== undefined) {
-                const inputTextarea = document.querySelector('.input-section .main-textarea');
-                if (inputTextarea) {
-                    inputTextarea.value = config.inputText;
-                    localStorage.setItem('inputText', config.inputText);
-                    if (typeof updateWordCount === 'function') {
-                        updateWordCount('input-count', config.inputText);
-                    }
-                }
-            }
-            
+            // Load output text only (inputText is handled separately by input management)
+            // 只加载输出文本（inputText由输入管理单独处理）
             if (config.outputText !== undefined) {
                 const outputTextarea = document.querySelector('.output-section .main-textarea');
                 if (outputTextarea) {
@@ -609,19 +613,17 @@ class ConfigurationManager {
                 }, 100);
             }
             
-            // Update other fields
-            // 更新其他字段
+            // Update other fields (skip API key for security)
+            // 更新其他字段（跳过API key以确保安全）
             const apiUrlInput = document.getElementById('api-url');
-            const apiKeyInput = document.getElementById('api-key');
             const maxTokensInput = document.querySelector('.config-grid .config-item:nth-child(5) .config-input');
             const temperatureInput = document.querySelector('.config-grid .config-item:nth-child(6) .config-input');
             
             if (apiUrlInput && modelConfig.apiUrl !== undefined) {
                 apiUrlInput.value = modelConfig.apiUrl;
             }
-            if (apiKeyInput && modelConfig.apiKey !== undefined) {
-                apiKeyInput.value = modelConfig.apiKey;
-            }
+            // Skip API key update for security reasons
+            // 出于安全考虑跳过API key更新
             if (maxTokensInput && modelConfig.maxTokens !== undefined) {
                 maxTokensInput.value = modelConfig.maxTokens;
             }

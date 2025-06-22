@@ -170,7 +170,10 @@ function renderInputItems() {
 // Update prompt buttons based on current input items
 function updatePromptButtons() {
     const container = document.getElementById('prompt-buttons-header');
-    // container.innerHTML = '<button class="btn-small" onclick="insertPromptVariable(\'input_box\')">+ input_box</button>';
+    
+    // Clear existing buttons before adding new ones to prevent duplication
+    // 在添加新按钮前清除现有按钮以防止重复
+    container.innerHTML = '';
     
     // Only add buttons for non-image input items
     // 只为非图片类型的输入项添加按钮
