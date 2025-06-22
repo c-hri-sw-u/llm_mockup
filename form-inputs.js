@@ -3,6 +3,7 @@ let inputItems = [];
 let currentEditingIndex = -1;
 let currentModalType = '';
 let deleteConfirmState = false;
+let updatePromptButtonsTimeout = null; // Add debounce timeout variable
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
@@ -167,25 +168,41 @@ function renderInputItems() {
     updateImgCount();
 }
 
-// Update prompt buttons based on current input items
+// Update prompt buttons based on current input items (with debounce)
 function updatePromptButtons() {
-    const container = document.getElementById('prompt-buttons-header');
+    // Clear any existing timeout to prevent multiple rapid calls
+    if (updatePromptButtonsTimeout) {
+        clearTimeout(updatePromptButtonsTimeout);
+    }
     
-    // Clear existing buttons before adding new ones to prevent duplication
-    // 在添加新按钮前清除现有按钮以防止重复
-    container.innerHTML = '';
-    
-    // Only add buttons for non-image input items
-    // 只为非图片类型的输入项添加按钮
-    inputItems.forEach(item => {
-        if (item.type !== 'image') {
-            const button = document.createElement('button');
-            button.className = 'btn-small';
-            button.onclick = () => insertPromptVariable(item.name);
-            button.innerHTML = `+ <span class="variable-name">${item.name}</span>`;
-            container.appendChild(button);
+    // Use setTimeout to debounce the function call
+    updatePromptButtonsTimeout = setTimeout(() => {
+        const container = document.getElementById('prompt-buttons-header');
+        
+        // Add defensive check to ensure container exists
+        if (!container) {
+            console.warn('prompt-buttons-header container not found');
+            return;
         }
-    });
+        
+        // Clear existing buttons before adding new ones to prevent duplication
+        // 在添加新按钮前清除现有按钮以防止重复
+        container.innerHTML = '';
+        
+        // Only add buttons for non-image input items
+        // 只为非图片类型的输入项添加按钮
+        inputItems.forEach(item => {
+            if (item.type !== 'image') {
+                const button = document.createElement('button');
+                button.className = 'btn-small';
+                button.onclick = () => insertPromptVariable(item.name);
+                button.innerHTML = `+ <span class="variable-name">${item.name}</span>`;
+                container.appendChild(button);
+            }
+        });
+        
+        updatePromptButtonsTimeout = null; // Reset timeout
+    }, 10); // 10ms debounce delay
 }
 
 // Update state functions
@@ -380,7 +397,9 @@ function renderModalContent(type, existingItem = null) {
 
 function addSelection() {
     const container = document.getElementById('selection-options');
-    const count = container.children.length + 1;
+    // Count only the selection options (exclude the None option which is always first)
+    const selectionOptions = container.querySelectorAll('.selection-option');
+    const count = selectionOptions.length + 1;
     const div = document.createElement('div');
     div.className = 'modal-form-group';
     div.innerHTML = `
@@ -393,11 +412,14 @@ function addSelection() {
 
 function removeSelection(button) {
     button.parentElement.remove();
-    // Renumber remaining selections
-    const options = document.querySelectorAll('#selection-options .modal-form-group');
-    options.forEach((option, index) => {
+    // Renumber remaining selections (skip the first child which is the None option)
+    const container = document.getElementById('selection-options');
+    const selectionGroups = Array.from(container.children).slice(1); // Skip None option
+    selectionGroups.forEach((option, index) => {
         const label = option.querySelector('label');
-        label.textContent = `SELECTION ${index + 1}:`;
+        if (label) {
+            label.textContent = `SELECTION ${index + 1}:`;
+        }
     });
 }
 
