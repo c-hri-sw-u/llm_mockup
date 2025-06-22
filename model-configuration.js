@@ -349,9 +349,7 @@ async function testApiConfiguration() {
             case 'deepSeek':
                 testResult = await testDeepSeekAPI();
                 break;
-            case 'google':
-                testResult = await testGoogleTranslateAPI();
-                break;
+
             default:
                 console.error('[ModelConfig] ❌ Unsupported Provider:', currentConfig.provider);
                 return;
@@ -550,43 +548,7 @@ async function testDeepSeekAPI() {
     }
 }
 
-// Google Translate API test
-async function testGoogleTranslateAPI() {
-    console.log('[ModelConfig] 🔴 Starting Google Translate API test');
-    
-    const fullUrl = `${currentConfig.apiUrl}?key=${currentConfig.apiKey}`;
-    console.log('[ModelConfig] 🔴 Complete request URL:', fullUrl);
-    
-    const requestBody = {
-        q: "hi",
-        target: "es",
-        format: "text"
-    };
-    
-    console.log('[ModelConfig] 🔴 Request body:', JSON.stringify(requestBody, null, 2));
-    
-    try {
-        const response = await fetch(fullUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify(requestBody)
-        });
-        
-        console.log('[ModelConfig] 🔴 HTTP status code:', response.status);
-        console.log('[ModelConfig] 🔴 Response headers:', Object.fromEntries(response.headers.entries()));
-        
-        const responseText = await response.text();
-        console.log('[ModelConfig] 🔴 Response body:', responseText);
-        
-        return response.ok;
-        
-    } catch (error) {
-        console.error('[ModelConfig] ❌ Google Translate test error:', error);
-        return false;
-    }
-}
+
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {

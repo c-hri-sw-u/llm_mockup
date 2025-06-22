@@ -95,16 +95,15 @@ async function handleRunModel() {
             return;
         }
         
-        // Build complete prompt
-        const fullPrompt = buildFullPrompt(inputText);
-        console.log('[ModelRunner] 📝 Built complete prompt length:', fullPrompt.length);
-        console.log('[ModelRunner] 📝 Prompt preview:', fullPrompt.substring(0, 200) + '...');
+        // Build messages with proper system/user separation
+        const messageData = buildMessages(inputText);
+        console.log('[ModelRunner] 📝 Message mode:', messageData.mode);
         
         // Set running state
         setRunningState(true);
         
         // Call API
-        const result = await callLLMAPI(fullPrompt);
+        const result = await callLLMAPI(messageData);
         
         // Display result
         displayResult(result);
@@ -176,44 +175,49 @@ function getInputText() {
     return text;
 }
 
-// Build complete prompt (based on Swift CallLLMService logic)
-function buildFullPrompt(inputText) {
-    console.log('[ModelRunner] 🔧 Building complete prompt');
+// Build messages array with proper system/user separation
+function buildMessages(inputText) {
+    console.log('[ModelRunner] 🔧 Building messages with system/user separation');
     
-    // Get prompt template
+    // Get system prompt from prompt textarea
     const promptTextarea = document.querySelector('.prompt-textarea');
-    let promptTemplate = '';
+    let systemPrompt = '';
     
     if (promptTextarea) {
-        promptTemplate = promptTextarea.value.trim();
+        systemPrompt = promptTextarea.value.trim();
     }
     
-    // If no prompt template, use default template and display in UI
-    if (!promptTemplate) {
-        promptTemplate = 'Please process the following content:\n\n{{input_box}}';
-        console.log('[ModelRunner] 🔧 Using default prompt template');
+    // Check if system prompt contains {{input_box}} for backward compatibility
+    const hasInputBoxVariable = systemPrompt.includes('{{input_box}}');
+    
+    if (hasInputBoxVariable) {
+        // Backward compatibility mode: expand variables and send as single user message
+        console.log('[ModelRunner] 🔧 Using legacy mode - found {{input_box}} in system prompt');
         
-        // Display default template in prompt textarea for user to see
-        if (promptTextarea) {
-            promptTextarea.value = promptTemplate;
-            promptTextarea.style.color = '#888'; // Set to gray to indicate it's default
-            
-            // Clear default style when user clicks
-            promptTextarea.addEventListener('focus', function() {
-                this.style.color = '';
-            }, { once: true });
-        }
+        let expandedPrompt = expandPromptVariablesInRunModel(systemPrompt, inputText);
+        
+        console.log('[ModelRunner] 🔧 Legacy mode - expanded prompt:', expandedPrompt.substring(0, 200) + '...');
+        
+        return {
+            mode: 'legacy',
+            content: expandedPrompt
+        };
+    } else {
+        // New separation mode: system prompt + user input as separate messages
+        console.log('[ModelRunner] 🔧 Using separation mode - system prompt and user input separated');
+        
+        // Expand other variables in system prompt (but not {{input_box}})
+        let expandedSystemPrompt = expandPromptVariablesInRunModel(systemPrompt, '');
+        
+        console.log('[ModelRunner] 🔧 System prompt:', expandedSystemPrompt.substring(0, 100) + '...');
+        console.log('[ModelRunner] 🔧 User input:', inputText.substring(0, 100) + '...');
+        
+        return {
+            mode: 'separated',
+            systemPrompt: expandedSystemPrompt,
+            userInput: inputText
+        };
     }
-    
-    // Use the same variable expansion logic as prompt-textarea.js
-    // 使用与prompt-textarea.js相同的变量展开逻辑
-    let expandedPrompt = expandPromptVariablesInRunModel(promptTemplate, inputText);
-    
-    console.log('[ModelRunner] 🔧 Prompt template (folded):', promptTemplate.substring(0, 100) + '...');
-    console.log('[ModelRunner] 🔧 Input text:', inputText.substring(0, 100) + '...');
-    console.log('[ModelRunner] 🔧 Final complete prompt sent (unfolded):', expandedPrompt.substring(0, 200) + '...');
-    
-    return expandedPrompt;
 }
 
 // Expand prompt variables for run model (similar to prompt-textarea.js but for run-time)
@@ -295,7 +299,7 @@ function setRunningState(running) {
 }
 
 // Call LLM API (based on Swift LLMAPIManager logic)
-async function callLLMAPI(promptText) {
+async function callLLMAPI(messageData) {
     console.log('[ModelRunner] 🌐 Starting LLM API call');
     
     const currentConfig = window.ModelConfiguration.getCurrentConfig();
@@ -314,43 +318,95 @@ async function callLLMAPI(promptText) {
     const enabledImages = getEnabledImages();
     console.log('[ModelRunner] 🖼️ Found enabled images:', enabledImages.length);
     
-    // Build messages array with images for supported models
+    // Build messages array based on mode
     let messages;
     
-    if (enabledImages.length > 0 && isImageSupportedByCurrentModel()) {
-        // Build message with images
-        const content = [
-            {
-                type: "text",
-                text: promptText
-            }
-        ];
+    if (messageData.mode === 'legacy') {
+        // Legacy mode: single user message with expanded content
+        console.log('[ModelRunner] 🌐 Building legacy format messages');
         
-        // Add images to content
-        enabledImages.forEach(imageItem => {
-            content.push({
-                type: "image_url",
-                image_url: {
-                    url: imageItem.imageData
+        if (enabledImages.length > 0 && isImageSupportedByCurrentModel()) {
+            // Build message with images
+            const content = [
+                {
+                    type: "text",
+                    text: messageData.content
                 }
+            ];
+            
+            // Add images to content
+            enabledImages.forEach(imageItem => {
+                content.push({
+                    type: "image_url",
+                    image_url: {
+                        url: imageItem.imageData
+                    }
+                });
             });
-        });
+            
+            messages = [
+                {
+                    role: "user",
+                    content: content
+                }
+            ];
+        } else {
+            // Build text-only message
+            messages = [
+                {
+                    role: "user",
+                    content: messageData.content
+                }
+            ];
+        }
+    } else {
+        // Separated mode: system prompt + user input
+        console.log('[ModelRunner] 🌐 Building separated format messages');
         
-        messages = [
-            {
+        messages = [];
+        
+        // Add system message if system prompt exists
+        if (messageData.systemPrompt && messageData.systemPrompt.trim()) {
+            messages.push({
+                role: "system",
+                content: messageData.systemPrompt
+            });
+        }
+        
+        // Add user message
+        if (enabledImages.length > 0 && isImageSupportedByCurrentModel()) {
+            // Build user message with images
+            const content = [
+                {
+                    type: "text",
+                    text: messageData.userInput
+                }
+            ];
+            
+            // Add images to content
+            enabledImages.forEach(imageItem => {
+                content.push({
+                    type: "image_url",
+                    image_url: {
+                        url: imageItem.imageData
+                    }
+                });
+            });
+            
+            messages.push({
                 role: "user",
                 content: content
-            }
-        ];
-    } else {
-        // Build text-only message
-        messages = [
-        {
-            role: "user",
-            content: promptText
+            });
+        } else {
+            // Build text-only user message
+            messages.push({
+                role: "user",
+                content: messageData.userInput
+            });
         }
-    ];
     }
+    
+    console.log('[ModelRunner] 🌐 Final messages structure:', JSON.stringify(messages, null, 2));
     
     const startTime = Date.now();
     
@@ -371,9 +427,7 @@ async function callLLMAPI(promptText) {
             case 'deepSeek':
                 result = await callDeepSeekAPI(messages, currentConfig);
                 break;
-            case 'google':
-                result = await callGoogleTranslateAPI(promptText, currentConfig);
-                break;
+
             default:
                 throw new Error(`Unsupported Provider: ${currentConfig.provider}`);
         }
@@ -622,39 +676,7 @@ async function callDeepSeekAPI(messages, config) {
     return data.choices[0].message.content;
 }
 
-// Google Translate API call
-async function callGoogleTranslateAPI(text, config) {
-    console.log('[ModelRunner] 🔴 Calling Google Translate API');
-    
-    const fullUrl = `${config.apiUrl}?key=${config.apiKey}`;
-    const requestBody = {
-        q: text,
-        target: 'en', // Default translate to English, can be adjusted as needed
-        format: 'text'
-    };
-    
-    const response = await fetch(fullUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody),
-        signal: abortController.signal
-    });
-    
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Google Translate API error (${response.status}): ${errorText}`);
-    }
-    
-    const data = await response.json();
-    
-    if (!data.data || !data.data.translations || !data.data.translations[0]) {
-        throw new Error('Google Translate API response format error');
-    }
-    
-    return data.data.translations[0].translatedText;
-}
+
 
 // Display result
 function displayResult(result) {

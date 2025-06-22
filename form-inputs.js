@@ -170,7 +170,7 @@ function renderInputItems() {
 // Update prompt buttons based on current input items
 function updatePromptButtons() {
     const container = document.getElementById('prompt-buttons-header');
-    container.innerHTML = '<button class="btn-small" onclick="insertPromptVariable(\'input_box\')">+ input_box</button>';
+    // container.innerHTML = '<button class="btn-small" onclick="insertPromptVariable(\'input_box\')">+ input_box</button>';
     
     // Only add buttons for non-image input items
     // 只为非图片类型的输入项添加按钮
@@ -179,7 +179,7 @@ function updatePromptButtons() {
             const button = document.createElement('button');
             button.className = 'btn-small';
             button.onclick = () => insertPromptVariable(item.name);
-            button.textContent = `+ ${item.name}`;
+            button.innerHTML = `+ <span class="variable-name">${item.name}</span>`;
             container.appendChild(button);
         }
     });
@@ -532,24 +532,24 @@ function insertPromptVariable(variableName) {
     const textAfter = textarea.value.substring(cursorPos);
     
     let variable = '';
-    if (variableName === 'input_box') {
-        variable = '{{input_box}}';
-    } else {
-        const item = inputItems.find(i => i.name === variableName);
-        if (item) {
-            variable = `{{${variableName}}}`;
-        }
+    // Note: input_box is no longer supported in separated mode
+    // Only insert variables for dynamic input items
+    const item = inputItems.find(i => i.name === variableName);
+    if (item) {
+        variable = `{{${variableName}}}`;
     }
     
-    textarea.value = textBefore + variable + textAfter;
-    textarea.focus();
-    textarea.setSelectionRange(cursorPos + variable.length, cursorPos + variable.length);
-    
-    // Use the new expanded word count function
-    if (typeof updatePromptWordCount === 'function') {
-        updatePromptWordCount();
-    } else {
-        updateWordCount('prompt-count', textarea.value);
+    if (variable) {
+        textarea.value = textBefore + variable + textAfter;
+        textarea.focus();
+        textarea.setSelectionRange(cursorPos + variable.length, cursorPos + variable.length);
+        
+        // Use the new expanded word count function
+        if (typeof updatePromptWordCount === 'function') {
+            updatePromptWordCount();
+        } else {
+            updateWordCount('prompt-count', textarea.value);
+        }
     }
 }
 

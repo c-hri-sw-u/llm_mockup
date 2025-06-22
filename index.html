@@ -52,7 +52,7 @@
                     <span class="word-count">WORDS: <span id="output-count">0</span></span>
                     <div class="output-buttons">
                         <button class="btn-small" id="save-config-btn">SAVE CONFIG</button>
-                        <button class="btn-small" id="import-config-btn">IMPORT</button>
+                        <button class="btn-small" id="import-config-btn">IMPORT CONFIG</button>
                     </div>
                 </div>
             </div>
@@ -108,12 +108,12 @@
             <!-- Prompt section -->
             <div class="prompt-section">
                 <div class="prompt-header">
-                    <h3>PROMPT</h3>
+                    <h3>SYSTEM PROMPT</h3>
                     <div class="prompt-buttons-header" id="prompt-buttons-header">
-                        <button class="btn-small" onclick="insertPromptVariable('input_box')">+ input_box</button>
+                        <!-- Removed + input_box button for cleaner separation -->
                     </div>
                 </div>
-                <textarea class="prompt-textarea" placeholder="Input"></textarea>
+                <textarea class="prompt-textarea" placeholder="Enter system instructions (role: system). User input will be sent separately."></textarea>
                 <div class="prompt-footer">
                     <span class="word-count">WORDS: <span id="prompt-count">0</span> | IMG: <span id="img-count">0</span></span>
                     <div class="prompt-buttons">

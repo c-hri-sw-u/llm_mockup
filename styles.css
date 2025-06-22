@@ -190,6 +190,11 @@ body {
     background-color: #d0d0d0;
 }
 
+/* Variable name in prompt buttons */
+.variable-name {
+    text-decoration: underline;
+}
+
 .input-buttons {
     display: flex;
     gap: 8px;
