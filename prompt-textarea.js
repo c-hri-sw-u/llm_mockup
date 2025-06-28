@@ -163,6 +163,8 @@ function updateDisplayAndWordCount() {
         updateTextareaDisplay();
     } else {
         // In unfold mode, show expanded text with underlines
+        // Use originalPromptText as the source for expansion
+        // 在unfold模式下，使用originalPromptText作为展开的源文本
         const currentText = originalPromptText || promptTextarea.value;
         const expandedHtml = expandPromptVariablesForDisplay(currentText);
         
@@ -184,7 +186,9 @@ function updateTextareaDisplay(htmlContent) {
     
     if (!isFoldMode) {
         // Create wrapper if it doesn't exist
-        let wrapper = promptTextarea.parentNode.querySelector('.prompt-textarea-wrapper');
+        // Check if textarea is already inside a wrapper
+        let wrapper = promptTextarea.closest('.prompt-textarea-wrapper');
+        
         if (!wrapper) {
             wrapper = document.createElement('div');
             wrapper.className = 'prompt-textarea-wrapper';
@@ -205,7 +209,13 @@ function updateTextareaDisplay(htmlContent) {
         }
         
         // Create or update display div
+        // First, remove any existing display divs to prevent duplicates
+        // 首先移除任何现有的显示div以防止重复
+        const existingDisplayDivs = wrapper.querySelectorAll('.prompt-display');
+        existingDisplayDivs.forEach(div => div.remove());
+        
         let displayDiv = wrapper.querySelector('.prompt-display');
+        
         if (!displayDiv) {
             displayDiv = document.createElement('div');
             displayDiv.className = 'prompt-display';
@@ -229,9 +239,19 @@ function updateTextareaDisplay(htmlContent) {
             `;
             wrapper.appendChild(displayDiv);
         }
+        
         displayDiv.innerHTML = htmlContent;
+        
+        // Force DOM refresh by triggering a reflow
+        // 通过触发重排来强制刷新DOM
+        displayDiv.offsetHeight;
+        
         promptTextarea.style.color = 'transparent';
         promptTextarea.style.caretColor = 'black';
+        
+        // Ensure textarea value is kept in sync with originalPromptText in unfold mode
+        // 确保在unfold模式下textarea的值与originalPromptText保持同步
+        promptTextarea.value = originalPromptText;
         
         // Disable textarea editing in unfold mode
         promptTextarea.disabled = true;
@@ -301,6 +321,10 @@ function toggleFoldMode() {
         // Switch to fold mode
         isFoldMode = true;
         foldButton.textContent = 'UNFOLD';
+        
+        // Important: Re-enable textarea first before setting value
+        // 重要：在设置值之前先重新启用textarea
+        promptTextarea.disabled = false;
         promptTextarea.value = originalPromptText; // Restore original text
     }
     
@@ -461,7 +485,10 @@ function updatePromptWordCount() {
     
     const promptTextarea = document.querySelector('.prompt-textarea');
     if (promptTextarea) {
-        // Sync originalPromptText with current textarea value in fold mode
+        // In fold mode: sync originalPromptText with current textarea value
+        // In unfold mode: keep originalPromptText unchanged but update display
+        // 在fold模式下：同步originalPromptText与当前textarea值
+        // 在unfold模式下：保持originalPromptText不变但更新显示
         if (isFoldMode) {
             // Only update if textarea has content or originalPromptText is empty
             // This prevents overwriting saved content during initialization
@@ -474,6 +501,11 @@ function updatePromptWordCount() {
                 }
             }
         }
+        
+        // Always update display and word count, regardless of mode
+        // This ensures both modes show updated content when input items change
+        // 总是更新显示和字数统计，无论在哪种模式下
+        // 这确保两种模式下当输入项改变时都显示更新的内容
         updateDisplayAndWordCount();
     }
     

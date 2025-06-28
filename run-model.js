@@ -501,6 +501,14 @@ async function callOpenAIAPI(messages, config) {
         throw new Error('OpenAI API response format error');
     }
     
+    // Log token usage statistics
+    if (data.usage) {
+        console.log('[ModelRunner] 🟠 Token Usage Statistics:');
+        console.log('[ModelRunner] 🟠 Prompt Tokens:', data.usage.prompt_tokens || 0);
+        console.log('[ModelRunner] 🟠 Completion Tokens:', data.usage.completion_tokens || 0);
+        console.log('[ModelRunner] 🟠 Total Tokens:', data.usage.total_tokens || 0);
+    }
+    
     return data.choices[0].message.content;
 }
 
@@ -569,6 +577,14 @@ async function callClaudeAPI(messages, config) {
         throw new Error('Claude API response format error');
     }
     
+    // Log token usage statistics
+    if (data.usage) {
+        console.log('[ModelRunner] 🟣 Token Usage Statistics:');
+        console.log('[ModelRunner] 🟣 Input Tokens:', data.usage.input_tokens || 0);
+        console.log('[ModelRunner] 🟣 Output Tokens:', data.usage.output_tokens || 0);
+        console.log('[ModelRunner] 🟣 Total Tokens:', (data.usage.input_tokens || 0) + (data.usage.output_tokens || 0));
+    }
+    
     return data.content[0].text;
 }
 
@@ -633,6 +649,14 @@ async function callGeminiAPI(messages, config) {
         throw new Error('Gemini API response format error');
     }
     
+    // Log token usage statistics
+    if (data.usageMetadata) {
+        console.log('[ModelRunner] 🟢 Token Usage Statistics:');
+        console.log('[ModelRunner] 🟢 Prompt Tokens:', data.usageMetadata.promptTokenCount || 0);
+        console.log('[ModelRunner] 🟢 Completion Tokens:', data.usageMetadata.candidatesTokenCount || 0);
+        console.log('[ModelRunner] 🟢 Total Tokens:', data.usageMetadata.totalTokenCount || 0);
+    }
+    
     return data.candidates[0].content.parts[0].text;
 }
 
@@ -673,10 +697,16 @@ async function callDeepSeekAPI(messages, config) {
         throw new Error('DeepSeek API response format error');
     }
     
+    // Log token usage statistics
+    if (data.usage) {
+        console.log('[ModelRunner] 🔵 Token Usage Statistics:');
+        console.log('[ModelRunner] 🔵 Prompt Tokens:', data.usage.prompt_tokens || 0);
+        console.log('[ModelRunner] 🔵 Completion Tokens:', data.usage.completion_tokens || 0);
+        console.log('[ModelRunner] 🔵 Total Tokens:', data.usage.total_tokens || 0);
+    }
+    
     return data.choices[0].message.content;
 }
-
-
 
 // Display result
 function displayResult(result) {
