@@ -338,14 +338,14 @@ function renderModalContent(type, existingItem = null) {
                     </div>
                     ${options.length > 0 ? options.map((option, index) => `
                         <div class="modal-form-group">
-                            <label>SELECTION ${index + 1}:</label>
+                            <label>OPTION ${index + 1}:</label>
                             <input type="text" class="modal-input selection-option" 
                                    value="${option}" placeholder="Input">
                             <button type="button" class="btn-add" onclick="removeSelection(this)">-</button>
                         </div>
                     `).join('') : `
                         <div class="modal-form-group">
-                            <label>SELECTION 1:</label>
+                            <label>OPTION 1:</label>
                             <input type="text" class="modal-input selection-option" 
                                    value="Input" placeholder="Input">
                         </div>

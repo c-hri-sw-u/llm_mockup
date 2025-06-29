@@ -62,6 +62,12 @@ function expandPromptVariables(promptText) {
     // Replace {{input_box}} with actual input content
     expandedText = expandedText.replace(/\{\{input_box\}\}/g, inputBoxContent);
     
+    // Replace {{short_history}} with actual short history content
+    if (typeof window.getShortHistory !== 'undefined') {
+        const shortHistoryContent = window.getShortHistory();
+        expandedText = expandedText.replace(/\{\{short_history\}\}/g, shortHistoryContent);
+    }
+    
     // Replace input item variables with their present values (exclude image types)
     // 替换输入项变量的值（排除图片类型）
     if (typeof inputItems !== 'undefined') {
@@ -110,6 +116,18 @@ function expandPromptVariablesForDisplay(promptText) {
     
     // Replace {{input_box}} with actual input content (with underline)
     expandedText = expandedText.replace(/\{\{input_box\}\}/g, `<u>${inputBoxContent}</u>`);
+    
+    // Replace {{short_history}} with actual short history content (with underline)
+    if (typeof window.getShortHistory !== 'undefined') {
+        const shortHistoryContent = window.getShortHistory();
+        // Escape HTML and preserve line breaks
+        const escapedContent = shortHistoryContent
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br>');
+        expandedText = expandedText.replace(/\{\{short_history\}\}/g, `<u>${escapedContent}</u>`);
+    }
     
     // Replace input item variables with their present values (with underline, exclude image types)
     // 替换输入项变量的值（带下划线，排除图片类型）

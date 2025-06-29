@@ -229,6 +229,13 @@ function expandPromptVariablesInRunModel(promptText, inputText) {
     // 用实际输入内容替换{{input_box}}
     expandedText = expandedText.replace(/\{\{input_box\}\}/g, inputText);
     
+    // Replace {{short_history}} with actual short history content
+    // 用实际短历史内容替换{{short_history}}
+    if (typeof window.getShortHistory !== 'undefined') {
+        const shortHistoryContent = window.getShortHistory();
+        expandedText = expandedText.replace(/\{\{short_history\}\}/g, shortHistoryContent);
+    }
+    
     // Replace input item variables with their present values (exclude image types)
     // 替换输入项变量的值（排除图片类型）
     if (typeof inputItems !== 'undefined') {
@@ -725,6 +732,21 @@ function displayResult(result) {
         outputTextarea.scrollTop = 0;
         
         console.log('[ModelRunner] ✅ Result displayed in output box');
+        
+        // Auto-add dialogue to short history if multi-round is enabled
+        if (typeof window.ShortHistory !== 'undefined' && window.ShortHistory.isEnabled()) {
+            const inputTextarea = document.querySelector('.input-section .main-textarea');
+            if (inputTextarea) {
+                const inputText = inputTextarea.value;
+                const outputText = result;
+                
+                console.log('[ModelRunner] 🔄 Adding dialogue to short history');
+                window.ShortHistory.addDialogue(inputText, outputText);
+            } else {
+                console.warn('[ModelRunner] ⚠️ Could not find input textarea for short history');
+            }
+        }
+        
     } else {
         console.error('[ModelRunner] ❌ Output textarea not found');
     }

@@ -238,7 +238,7 @@ body {
 .config-item {
     display: flex;
     flex-direction: column;
-    gap: 5px;
+    gap: 7px;
 }
 
 .config-item label {
@@ -704,6 +704,19 @@ input:checked + .toggle-slider:before {
     box-shadow: none;
 }
 
+.config-input[disabled] {
+    background-color: #f5f5f5;
+    color: #999;
+    cursor: not-allowed;
+    border-color: #ccc;
+}
+
+.config-input[disabled]:focus {
+    outline: none;
+    border-color: #ccc;
+    box-shadow: none;
+}
+
 /* Voice Input Styles */
 /* 语音输入样式 */
 .btn-small.listening {
@@ -949,7 +962,290 @@ input:checked + .toggle-slider:before {
     transform: translateX(0);
 }
 
+/* Log Management Styles */
+/* 对话记录管理样式 */
+
+/* Floating LOG button */
+.log-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #333;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+}
+
+.log-toggle-btn:hover {
+    background-color: #555;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.log-toggle-btn.active {
+    background-color: #000;
+}
+
+/* Log panel */
+.log-panel {
+    position: fixed;
+    top: 60px;
+    right: -400px;
+    width: 400px;
+    height: calc(100vh - 120px);
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: white;
+    /* border-left: 1px solid #ddd; */
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: right 0.3s ease;
+    box-shadow: 0px 0 20px rgba(0, 0, 0, 0.1);
+    
+
+}
+
+.log-panel.open {
+    right: 0;
+}
+
+.log-panel-header {
+    padding: 20px;
+    border-bottom: 1px solid #ddd;
+    background-color: #f8f8f8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1001;
+}
+
+.log-panel-header h3 {
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0;
+    color: #333;
+    
+}
+
+.log-panel-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    margin-right: 32px;
+}
+
+.log-panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+.no-logs-message {
+    padding: 40px 20px;
+    text-align: center;
+    color: #666;
+    font-size: 11px;
+    font-style: italic;
+}
+
+/* Log entry styles */
+.log-entry {
+    border-bottom: 1px solid #eee;
+    padding: 20px;
+    background-color: white;
+    transition: background-color 0.2s ease;
+}
+
+.log-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.log-entry-timestamp {
+    font-size: 10px;
+    color: #666;
+    font-weight: 500;
+}
+
+.log-entry-round {
+    font-size: 10px;
+    color: #000000;
+    font-weight: 600;
+    background-color: #cccccc;
+    padding: 2px 6px;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.log-entry-actions {
+    display: flex;
+    gap: 6px;
+}
+
+.log-entry-config {
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #f8f8f8;
+    border-radius: 4px;
+    border: 1px solid #e0e0e0;
+}
+
+.log-config-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.log-config-title {
+    font-size: 10px;
+    font-weight: 600;
+    color: #333;
+    text-transform: uppercase;
+}
+
+.log-config-items {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.log-config-item {
+    font-size: 9px;
+    background-color: #e0e0e0;
+    color: #333;
+    padding: 2px 6px;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+}
+
+.log-config-model {
+    font-size: 10px;
+    color: #666;
+    margin-bottom: 6px;
+}
+
+.log-config-prompt {
+    font-size: 9px;
+    color: #777;
+    background-color: #f0f0f0;
+    padding: 6px;
+    border-radius: 3px;
+    max-height: 40px;
+    overflow: hidden;
+    position: relative;
+}
+
+.log-config-prompt.truncated::after {
+    content: "...";
+    position: absolute;
+    bottom: 6px;
+    right: 6px;
+    background-color: #f0f0f0;
+    padding-left: 10px;
+}
+
+.log-io-section {
+    margin-bottom: 12px;
+}
+
+.log-io-label {
+    font-size: 10px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.log-io-content {
+    background-color: #f8f8f8;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 10px;
+    font-size: 10px;
+    line-height: 1.4;
+    max-height: 80px;
+    overflow-y: auto;
+    color: #333;
+}
+
+.log-io-content.output {
+    background-color: #f0f8ff;
+    border-color: #c0d4f0;
+}
+
+/* Multi-round group styles */
+.log-multi-round-group {
+    /* border: 2px solid #797979; */
+    border-radius: 6px;
+    margin: 0px;
+    background-color: #f8f8f8;
+}
+
+.log-multi-round-header {
+    background-color: #e8e8e8;
+    color: rgb(0, 0, 0);
+    padding: 8px 15px;
+    font-size: 11px;
+    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.log-multi-round-content {
+    padding: 0;
+}
+
+.log-multi-round-content .log-entry {
+    border-bottom: 1px solid #e0f0e0;
+    border-left: none;
+    background-color: transparent;
+}
+
+.log-multi-round-content .log-entry:last-child {
+    border-bottom: none;
+}
+
+/* Export and clear button styles */
+.log-panel-actions .btn-small {
+    font-size: 10px;
+    padding: 4px 8px;
+    height: auto;
+}
+
 @media (max-width: 768px) {
+    .log-panel {
+        width: 100%;
+        right: -100%;
+    }
+    
+    .log-toggle-btn {
+        right: 15px;
+        top: 15px;
+    }
+    
+    .log-entry {
+        padding: 15px;
+    }
+    
+    .log-config-items {
+        justify-content: flex-start;
+    }
+    
     .import-modal-content {
         width: 95%;
         margin: 20px auto;

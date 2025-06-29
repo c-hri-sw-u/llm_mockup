@@ -54,7 +54,9 @@ let currentConfig = {
     apiUrl: '',
     apiKey: '',
     maxTokens: 1000,
-    temperature: 0.3
+    temperature: 0.3,
+    multiRounds: 5,
+    multiRoundsEnabled: false
 };
 
 // Initialize model configuration
@@ -68,6 +70,8 @@ function initializeModelConfiguration() {
     const apiKeyInput = document.getElementById('api-key');
     const maxTokensInput = document.querySelector('.config-grid .config-item:nth-child(5) .config-input');
     const temperatureInput = document.querySelector('.config-grid .config-item:nth-child(6) .config-input');
+    const multiRoundsInput = document.getElementById('multi-rounds');
+    const multiRoundsToggle = document.getElementById('multi-rounds-toggle');
     const saveTestButton = document.querySelector('.model-config-header .btn-small');
     
     // Populate Provider selector
@@ -80,6 +84,17 @@ function initializeModelConfiguration() {
     apiKeyInput.addEventListener('input', handleApiKeyChange);
     maxTokensInput.addEventListener('input', handleMaxTokensChange);
     temperatureInput.addEventListener('input', handleTemperatureChange);
+    multiRoundsInput.addEventListener('input', handleMultiRoundsChange);
+    
+    // Add input filter for multi-rounds to only allow numbers
+    multiRoundsInput.addEventListener('keypress', function(event) {
+        // Only allow numbers, backspace, delete, arrow keys
+        if (!/[0-9]/.test(event.key) && 
+            !['Backspace', 'Delete', 'ArrowLeft', 'ArrowRight', 'Tab'].includes(event.key)) {
+            event.preventDefault();
+        }
+    });
+    
     saveTestButton.addEventListener('click', handleSaveAndTest);
     
     console.log('[ModelConfig] ✅ Model configuration initialization complete');
@@ -233,6 +248,73 @@ function handleTemperatureChange(event) {
     saveConfiguration();
 }
 
+// Handle Multi-Rounds change
+function handleMultiRoundsChange(event) {
+    // Only handle changes if multi-rounds is enabled
+    if (!currentConfig.multiRoundsEnabled) {
+        return;
+    }
+    
+    let value = parseInt(event.target.value);
+    
+    // Validate range (2-30)
+    if (isNaN(value) || value < 2) {
+        value = 2;
+        event.target.value = value;
+    } else if (value > 30) {
+        value = 30;
+        event.target.value = value;
+    } else {
+        // Valid number, update the input to clean format
+        event.target.value = value;
+    }
+    
+    currentConfig.multiRounds = value;
+    console.log('[ModelConfig] 🔄 Multi-Rounds updated:', currentConfig.multiRounds);
+    
+    // Update short history management max rounds
+    if (currentConfig.multiRoundsEnabled && typeof window.ShortHistory !== 'undefined') {
+        window.ShortHistory.updateMaxRounds(value);
+    }
+    
+    // Auto-save configuration
+    // 自动保存配置
+    saveConfiguration();
+}
+
+// Handle Multi-Rounds toggle
+function toggleMultiRounds(enabled) {
+    currentConfig.multiRoundsEnabled = enabled;
+    
+    const multiRoundsInput = document.getElementById('multi-rounds');
+    if (enabled) {
+        multiRoundsInput.disabled = false;
+        multiRoundsInput.value = currentConfig.multiRounds || 5;
+        console.log('[ModelConfig] ✅ Multi-Rounds enabled:', currentConfig.multiRounds);
+        
+        // Enable short history management
+        if (typeof window.ShortHistory !== 'undefined') {
+            window.ShortHistory.enableMultiRound(currentConfig.multiRounds || 5);
+        }
+    } else {
+        multiRoundsInput.disabled = true;
+        multiRoundsInput.value = '--';
+        console.log('[ModelConfig] ❌ Multi-Rounds disabled');
+        
+        // Disable short history management
+        if (typeof window.ShortHistory !== 'undefined') {
+            window.ShortHistory.disableMultiRound();
+        }
+    }
+    
+    // Auto-save configuration
+    // 自动保存配置
+    saveConfiguration();
+}
+
+// Make toggleMultiRounds globally accessible
+window.toggleMultiRounds = toggleMultiRounds;
+
 // Handle Save & Test button click
 async function handleSaveAndTest() {
     console.log('[ModelConfig] 🚀 Starting save and test configuration');
@@ -338,11 +420,37 @@ function updateUIFromConfig() {
     const apiKeyInput = document.getElementById('api-key');
     const maxTokensInput = document.querySelector('.config-grid .config-item:nth-child(5) .config-input');
     const temperatureInput = document.querySelector('.config-grid .config-item:nth-child(6) .config-input');
+    const multiRoundsInput = document.getElementById('multi-rounds');
+    const multiRoundsToggle = document.getElementById('multi-rounds-toggle');
     
     if (apiUrlInput) apiUrlInput.value = currentConfig.apiUrl || '';
     if (apiKeyInput) apiKeyInput.value = currentConfig.apiKey || '';
     if (maxTokensInput) maxTokensInput.value = currentConfig.maxTokens || 1000;
     if (temperatureInput) temperatureInput.value = currentConfig.temperature || 0.3;
+    
+    // Update multi-rounds toggle and input
+    if (multiRoundsToggle) {
+        multiRoundsToggle.checked = currentConfig.multiRoundsEnabled || false;
+    }
+    if (multiRoundsInput) {
+        if (currentConfig.multiRoundsEnabled) {
+            multiRoundsInput.disabled = false;
+            multiRoundsInput.value = currentConfig.multiRounds || 5;
+            
+            // Enable short history management if enabled
+            if (typeof window.ShortHistory !== 'undefined') {
+                window.ShortHistory.enableMultiRound(currentConfig.multiRounds || 5);
+            }
+        } else {
+            multiRoundsInput.disabled = true;
+            multiRoundsInput.value = '--';
+            
+            // Disable short history management if disabled
+            if (typeof window.ShortHistory !== 'undefined') {
+                window.ShortHistory.disableMultiRound();
+            }
+        }
+    }
 }
 
 // API test functionality (based on Swift APITestService)
@@ -591,5 +699,6 @@ window.ModelConfiguration = {
     getServiceProviders: () => ServiceProviders,
     testAPI: testApiConfiguration,
     saveConfig: saveConfiguration,
-    loadConfig: loadConfiguration
+    loadConfig: loadConfiguration,
+    toggleMultiRounds: toggleMultiRounds
 };

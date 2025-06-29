@@ -8,6 +8,24 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Floating LOG button -->
+    <button id="log-toggle-btn" class="log-toggle-btn" onclick="toggleLogPanel()">LOG</button>
+    
+    <!-- Log panel -->
+    <div id="log-panel" class="log-panel">
+        <div class="log-panel-header">
+            <h3>CONVERSATION LOG</h3>
+            <div class="log-panel-actions">
+                <button class="btn-small" style="background: unset;" onclick="clearAllLogs()">CLEAR ALL</button>
+                <button class="btn-small" style="background: unset;" onclick="exportLogs()">EXPORT</button>
+            </div>
+            <button class="close-btn" onclick="toggleLogPanel()">×</button>
+        </div>
+        <div class="log-panel-content" id="log-panel-content">
+            <div class="no-logs-message">No conversation logs yet</div>
+        </div>
+    </div>
+    
     <div class="container">
         <!-- Top buttons -->
         <div class="top-buttons-header">
@@ -102,6 +120,16 @@
                         <label>IMAGE CAPABILITY:</label>
                         <input type="text" class="config-input" id="image-capability" value="false" readonly>
                     </div>
+                    <div class="config-item" style="gap: 4px;">
+                        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 0;">
+                            <label>MULTI-ROUNDS:</label>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="multi-rounds-toggle" onchange="toggleMultiRounds(this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                        <input type="text" class="config-input" id="multi-rounds" value="--" disabled>
+                    </div>
                 </div>
             </div>
             
@@ -144,9 +172,11 @@
     <script src="form-inputs.js"></script>
     <script src="prompt-textarea.js"></script>
     <script src="model-configuration.js"></script>
+    <script src="short-history-management.js"></script>
     <script src="run-model.js"></script>
     <script src="input-management.js"></script>
     <script src="voice-input.js"></script>
     <script src="configuration-management.js"></script>
+    <script src="log-management.js"></script>
 </body>
 </html> 
