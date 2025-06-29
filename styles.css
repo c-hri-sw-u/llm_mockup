@@ -110,9 +110,12 @@ body {
 
 /* Divider */
 .divider {
-    height: 0;
-    border-top: 1px dashed #ddd;
+    height: 12px;
     margin-bottom: 50px;
+    position: relative;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 16'%3E%3Cpath d='M0,8 Q10,0 20,8 T40,8' stroke='%23ddd' stroke-width='1' fill='none'/%3E%3C/svg%3E");
+    background-repeat: repeat-x;
+    background-position: center;
 }
 
 /* Main content */
@@ -1001,7 +1004,7 @@ input:checked + .toggle-slider:before {
     width: 400px;
     height: calc(100vh - 120px);
     border-radius: 8px;
-    overflow: hidden;
+    
     background-color: white;
     /* border-left: 1px solid #ddd; */
     z-index: 1000;
@@ -1019,12 +1022,12 @@ input:checked + .toggle-slider:before {
 
 .log-panel-header {
     padding: 20px;
-    border-bottom: 1px solid #ddd;
+    /* border-bottom: 1px solid #ddd; */
     background-color: #f8f8f8;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    z-index: 1001;
+    border-radius: 8px 0 0 0;
 }
 
 .log-panel-header h3 {
@@ -1032,7 +1035,6 @@ input:checked + .toggle-slider:before {
     font-weight: 600;
     margin: 0;
     color: #333;
-    
 }
 
 .log-panel-actions {
