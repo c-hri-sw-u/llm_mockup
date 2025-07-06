@@ -7,42 +7,99 @@ const ServiceProviders = {
         name: 'OpenAI',
         value: 'openAI',
         defaultApiUrl: 'https://api.openai.com/v1',
-        suggestedModels: ['gpt-4o-mini', 'gpt-4-turbo', 'gpt-3.5-turbo'],
+        suggestedModels: ['gpt-4.1', 'gpt-4.1-mini', 'gpt-4.1-nano', 'gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo'],
         modelCharacteristics: {
+            'gpt-4.1': { maxTokens: 32768, temperature: 0.3, hasImageCapability: true, contextWindow: 1000000, pricing: '$2.00/1M input, $8.00/1M output' },
+            'gpt-4.1-mini': { maxTokens: 16384, temperature: 0.3, hasImageCapability: true, contextWindow: 1000000, pricing: '$0.40/1M input, $1.60/1M output' },
+            'gpt-4.1-nano': { maxTokens: 8192, temperature: 0.3, hasImageCapability: false, contextWindow: 500000, pricing: '$0.10/1M input, $0.40/1M output' },
+            'gpt-4o': { maxTokens: 4000, temperature: 0.3, hasImageCapability: false, speciality: 'Advanced reasoning and complex problem solving' },
             'gpt-4o-mini': { maxTokens: 2000, temperature: 0.3, hasImageCapability: true },
-            'gpt-4-turbo': { maxTokens: 4000, temperature: 0.3, hasImageCapability: true },
-            'gpt-3.5-turbo': { maxTokens: 2000, temperature: 0.3, hasImageCapability: false }
+            'gpt-4-turbo': { maxTokens: 4000, temperature: 0.3, hasImageCapability: true }
         }
     },
-    claude: {
-        name: 'Claude',
-        value: 'claude',
-        defaultApiUrl: 'https://api.anthropic.com/v1',
-        suggestedModels: ['claude-3-haiku-20240307', 'claude-3-sonnet-20240229', 'claude-3-opus-20240229'],
-        modelCharacteristics: {
-            'claude-3-haiku-20240307': { maxTokens: 2000, temperature: 0.3, hasImageCapability: true },
-            'claude-3-sonnet-20240229': { maxTokens: 3000, temperature: 0.3, hasImageCapability: true },
-            'claude-3-opus-20240229': { maxTokens: 4000, temperature: 0.3, hasImageCapability: true }
-        }
-    },
+    // claude: {
+    //     name: 'Claude',
+    //     value: 'claude',
+    //     defaultApiUrl: 'https://api.anthropic.com/v1',
+    //     suggestedModels: ['claude-opus-4-20250514', 'claude-sonnet-4-20250514', 'claude-3-7-sonnet-latest', 'claude-3-5-haiku-latest', 'claude-3-5-sonnet-latest', 'claude-3-5-sonnet-20240620', 'claude-3-haiku-20240307'],
+    //     modelCharacteristics: {
+    //         'claude-opus-4-20250514': { maxTokens: 4000, temperature: 0.3, hasImageCapability: true, contextWindow: 200000, speciality: 'Highest capability with advanced agentic features' },
+    //         'claude-sonnet-4-20250514': { maxTokens: 3000, temperature: 0.3, hasImageCapability: true, contextWindow: 200000, speciality: 'Balanced capability and speed with code execution' },
+    //         'claude-3-7-sonnet-latest': { maxTokens: 3000, temperature: 0.3, hasImageCapability: true, contextWindow: 200000, speciality: 'Hybrid reasoning modes and Claude Code beta' },
+    //         'claude-3-5-haiku-latest': { maxTokens: 3000, temperature: 0.3, hasImageCapability: true, contextWindow: 200000, speciality: 'Enhanced coding and Artifacts feature' },
+    //         'claude-3-5-sonnet-latest': { maxTokens: 3000, temperature: 0.3, hasImageCapability: true, contextWindow: 200000, speciality: 'Enhanced coding and Artifacts feature' },
+    //         'claude-3-5-sonnet-20240620': { maxTokens: 3000, temperature: 0.3, hasImageCapability: true, contextWindow: 200000, speciality: 'Enhanced coding and Artifacts feature' },
+    //         'claude-3-haiku-20240307': { maxTokens: 2000, temperature: 0.3, hasImageCapability: true, contextWindow: 200000, speciality: 'Speed optimized' }
+    //     }
+    // },
     gemini: {
         name: 'Gemini',
         value: 'gemini',
         defaultApiUrl: 'https://generativelanguage.googleapis.com/v1beta/models',
-        suggestedModels: ['gemini-2.0-flash', 'gemini-1.5-flash', 'gemini-1.5-flash-8b'],
+        suggestedModels: ['gemini-2.5-pro', 'gemini-2.5-flash', 'gemini-2.5-flash-lite-preview-06-17', 'gemini-2.0-flash', 'gemini-2.0-flash-lite'],
         modelCharacteristics: {
-            'gemini-2.0-flash': { maxTokens: 1000, temperature: 0.3, hasImageCapability: true },
-            'gemini-1.5-flash': { maxTokens: 1000, temperature: 0.3, hasImageCapability: true },
-            'gemini-1.5-flash-8b': { maxTokens: 1000, temperature: 0.3, hasImageCapability: true }
+            'gemini-2.5-pro': { maxTokens: 8000, temperature: 0.3, hasImageCapability: true, contextWindow: 1000000, speciality: 'Multimodal with advanced coding capabilities' },
+            'gemini-2.5-flash': { maxTokens: 2000, temperature: 0.3, hasImageCapability: true, contextWindow: 1000000, speciality: 'Fast inference with multimodal support' },
+            'gemini-2.5-flash-lite-preview-06-17': { maxTokens: 4000, temperature: 0.3, hasImageCapability: true, contextWindow: 128000 },
+            'gemini-2.0-flash': { maxTokens: 1000, temperature: 0.3, hasImageCapability: true, contextWindow: 128000 },
+            'gemini-2.0-flash-lite': { maxTokens: 1000, temperature: 0.3, hasImageCapability: true, contextWindow: 128000 }
         }
     },
     deepSeek: {
         name: 'DeepSeek',
         value: 'deepSeek',
         defaultApiUrl: 'https://api.deepseek.com/v1',
-        suggestedModels: ['deepseek-chat'],
+        suggestedModels: ['deepseek-reasoner', 'deepseek-chat'],
         modelCharacteristics: {
-            'deepseek-chat': { maxTokens: 1000, temperature: 0.3, hasImageCapability: false }
+            'deepseek-reasoner': { maxTokens: 4000, temperature: 0.3, hasImageCapability: false, contextWindow: 128000, speciality: 'Specialized for coding tasks' },
+            'deepseek-chat': { maxTokens: 1000, temperature: 0.3, hasImageCapability: false, contextWindow: 128000 }
+        }
+    },
+    xAI: {
+        name: 'xAI',
+        value: 'xai',
+        defaultApiUrl: 'https://api.x.ai/v1',
+        suggestedModels: ['grok-3', 'grok-2', 'grok-1.5'],
+        modelCharacteristics: {
+            'grok-3': { maxTokens: 4000, temperature: 0.3, hasImageCapability: true, speciality: 'Real-time information access and witty personality' },
+            'grok-2': { maxTokens: 3000, temperature: 0.3, hasImageCapability: true, speciality: 'Improved reasoning and image understanding' },
+            'grok-1.5': { maxTokens: 2000, temperature: 0.3, hasImageCapability: false, speciality: 'Fast inference with humor' }
+        }
+    },
+    meta: {
+        name: 'Meta',
+        value: 'meta',
+        defaultApiUrl: 'https://api.llama-api.com/v1',
+        suggestedModels: ['llama-4', 'llama-3.3-70b', 'llama-3.2-90b', 'llama-3.1-405b'],
+        modelCharacteristics: {
+            'llama-4': { maxTokens: 8000, temperature: 0.3, hasImageCapability: true, speciality: 'Latest generation with improved reasoning' },
+            'llama-3.3-70b': { maxTokens: 4000, temperature: 0.3, hasImageCapability: false, contextWindow: 128000, speciality: 'Optimized 70B parameter model' },
+            'llama-3.2-90b': { maxTokens: 4000, temperature: 0.3, hasImageCapability: true, contextWindow: 128000 },
+            'llama-3.1-405b': { maxTokens: 8000, temperature: 0.3, hasImageCapability: false, contextWindow: 128000, speciality: 'Largest open-source model' }
+        }
+    },
+    qwen: {
+        name: 'Qwen',
+        value: 'qwen',
+        defaultApiUrl: 'https://dashscope.aliyuncs.com/api/v1',
+        suggestedModels: ['qwen-3', 'qwen-2.5-72b', 'qwen-2.5-32b', 'qwen-2.5-14b'],
+        modelCharacteristics: {
+            'qwen-3': { maxTokens: 8000, temperature: 0.3, hasImageCapability: true, speciality: 'Latest generation with multimodal capabilities' },
+            'qwen-2.5-72b': { maxTokens: 4000, temperature: 0.3, hasImageCapability: true, contextWindow: 128000 },
+            'qwen-2.5-32b': { maxTokens: 3000, temperature: 0.3, hasImageCapability: false, contextWindow: 32000 },
+            'qwen-2.5-14b': { maxTokens: 2000, temperature: 0.3, hasImageCapability: false, contextWindow: 32000 }
+        }
+    },
+    mistral: {
+        name: 'Mistral',
+        value: 'mistral',
+        defaultApiUrl: 'https://api.mistral.ai/v1',
+        suggestedModels: ['mistral-large-2', 'mixtral-8x22b', 'mistral-medium', 'mistral-small'],
+        modelCharacteristics: {
+            'mistral-large-2': { maxTokens: 4000, temperature: 0.3, hasImageCapability: false, contextWindow: 128000, speciality: 'Latest flagship model' },
+            'mixtral-8x22b': { maxTokens: 4000, temperature: 0.3, hasImageCapability: false, contextWindow: 64000, speciality: 'Mixture of Experts architecture' },
+            'mistral-medium': { maxTokens: 3000, temperature: 0.3, hasImageCapability: false, contextWindow: 32000 },
+            'mistral-small': { maxTokens: 2000, temperature: 0.3, hasImageCapability: false, contextWindow: 32000 }
         }
     },
 };
@@ -53,7 +110,7 @@ let currentConfig = {
     model: null,
     apiUrl: '',
     apiKey: '',
-    maxTokens: 1000,
+    maxTokens: 2000,
     temperature: 0.3,
     multiRounds: 5,
     multiRoundsEnabled: false
@@ -552,42 +609,48 @@ async function testOpenAIAPI() {
 async function testClaudeAPI() {
     console.log('[ModelConfig] 🟣 Starting Claude API test');
     
-    const fullUrl = `${currentConfig.apiUrl}/messages`;
-    console.log('[ModelConfig] 🟣 Complete request URL:', fullUrl);
+    // Due to CORS limitations with Claude API, we'll perform configuration validation instead
+    console.log('[ModelConfig] 🟣 Note: Claude API testing is limited by CORS policy in browsers');
+    console.log('[ModelConfig] 🟣 Performing configuration validation instead of live API test');
     
-    const requestBody = {
-        model: currentConfig.model,
-        max_tokens: 1,
-        messages: [
-            { role: "user", content: "Hi" }
-        ]
-    };
-    
-    console.log('[ModelConfig] 🟣 Request body:', JSON.stringify(requestBody, null, 2));
-    
-    try {
-        const response = await fetch(fullUrl, {
-            method: 'POST',
-            headers: {
-                'x-api-key': currentConfig.apiKey,
-                'Content-Type': 'application/json',
-                'anthropic-version': '2023-06-01'
-            },
-            body: JSON.stringify(requestBody)
-        });
-        
-        console.log('[ModelConfig] 🟣 HTTP status code:', response.status);
-        console.log('[ModelConfig] 🟣 Response headers:', Object.fromEntries(response.headers.entries()));
-        
-        const responseText = await response.text();
-        console.log('[ModelConfig] 🟣 Response body:', responseText);
-        
-        return response.ok;
-        
-    } catch (error) {
-        console.error('[ModelConfig] ❌ Claude test error:', error);
+    // Validate API key format (Claude API keys start with 'sk-ant-')
+    if (!currentConfig.apiKey.startsWith('sk-ant-')) {
+        console.error('[ModelConfig] ❌ Invalid Claude API key format - should start with "sk-ant-"');
         return false;
     }
+    
+    // Validate API URL
+    if (!currentConfig.apiUrl.includes('anthropic.com')) {
+        console.error('[ModelConfig] ❌ Invalid Claude API URL - should contain "anthropic.com"');
+        return false;
+    }
+    
+    // Validate model exists in our configuration
+    const provider = ServiceProviders[currentConfig.provider];
+    if (!provider.suggestedModels.includes(currentConfig.model)) {
+        console.error('[ModelConfig] ❌ Invalid model selection for Claude');
+        return false;
+    }
+    
+    // Validate other parameters
+    if (currentConfig.maxTokens < 1 || currentConfig.maxTokens > 4096) {
+        console.error('[ModelConfig] ❌ Invalid max tokens - should be between 1 and 4096');
+        return false;
+    }
+    
+    if (currentConfig.temperature < 0 || currentConfig.temperature > 1) {
+        console.error('[ModelConfig] ❌ Invalid temperature - should be between 0 and 1');
+        return false;
+    }
+    
+    console.log('[ModelConfig] 🟣 ✅ Configuration validation passed');
+    console.log('[ModelConfig] 🟣 ✅ API key format is valid');
+    console.log('[ModelConfig] 🟣 ✅ API URL is valid');
+    console.log('[ModelConfig] 🟣 ✅ Model selection is valid');
+    console.log('[ModelConfig] 🟣 ✅ Parameters are within valid ranges');
+    console.log('[ModelConfig] 🟣 Note: For actual API connectivity testing, use a server-side implementation');
+    
+    return true;
 }
 
 // Gemini API test

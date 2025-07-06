@@ -523,76 +523,33 @@ async function callOpenAIAPI(messages, config) {
 async function callClaudeAPI(messages, config) {
     console.log('[ModelRunner] 🟣 Calling Claude API');
     
-    const fullUrl = `${config.apiUrl}/messages`;
+    // Due to CORS limitations with Claude API in browsers, we cannot make direct API calls
+    console.log('[ModelRunner] 🟣 ❌ Claude API calls are blocked by CORS policy in browsers');
+    console.log('[ModelRunner] 🟣 💡 To use Claude API, you need one of these solutions:');
+    console.log('[ModelRunner] 🟣 1. Set up a backend server to proxy the API calls');
+    console.log('[ModelRunner] 🟣 2. Use a browser extension that disables CORS (not recommended for security)');
+    console.log('[ModelRunner] 🟣 3. Use other providers like OpenAI, Gemini, or DeepSeek that allow direct browser calls');
     
-    // Convert messages for Claude format (Claude has different image format)
-    const claudeMessages = messages.map(msg => {
-        if (Array.isArray(msg.content)) {
-            // Handle content with images for Claude
-            const claudeContent = msg.content.map(item => {
-                if (item.type === 'image_url') {
-                    // Claude expects different format for images
-                    const base64Data = item.image_url.url.split(',')[1]; // Remove data:image/jpeg;base64, prefix
-                    const mediaType = item.image_url.url.match(/data:image\/([^;]+)/)?.[1] || 'jpeg';
-                    
-                    return {
-                        type: 'image',
-                        source: {
-                            type: 'base64',
-                            media_type: `image/${mediaType}`,
-                            data: base64Data
-                        }
-                    };
-                }
-                return item; // text content remains the same
-            });
-            
-            return {
-                ...msg,
-                content: claudeContent
-            };
-        }
-        return msg; // text-only messages remain the same
-    });
+    // Return a helpful error message instead of attempting the API call
+    const errorMessage = `❌ Claude API Limitation
+
+Due to browser security policies (CORS), Claude API calls cannot be made directly from this web application.
+
+📋 Your Configuration:
+• Provider: ${config.provider}
+• Model: ${config.model}
+• API URL: ${config.apiUrl}
+• Max Tokens: ${config.maxTokens}
+• Temperature: ${config.temperature}
+
+💡 Solutions:
+1. Use OpenAI, Gemini, or DeepSeek APIs (they work in browsers)
+2. Set up a backend server to proxy Claude API calls
+3. Use the Claude web interface directly at claude.ai
+
+🔧 Your configuration has been saved and can be used with a proper backend implementation.`;
     
-    const requestBody = {
-        model: config.model,
-        max_tokens: config.maxTokens,
-        temperature: config.temperature,
-        messages: claudeMessages
-    };
-    
-    const response = await fetch(fullUrl, {
-        method: 'POST',
-        headers: {
-            'x-api-key': config.apiKey,
-            'Content-Type': 'application/json',
-            'anthropic-version': '2023-06-01'
-        },
-        body: JSON.stringify(requestBody),
-        signal: abortController.signal
-    });
-    
-    if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Claude API error (${response.status}): ${errorText}`);
-    }
-    
-    const data = await response.json();
-    
-    if (!data.content || !data.content[0] || !data.content[0].text) {
-        throw new Error('Claude API response format error');
-    }
-    
-    // Log token usage statistics
-    if (data.usage) {
-        console.log('[ModelRunner] 🟣 Token Usage Statistics:');
-        console.log('[ModelRunner] 🟣 Input Tokens:', data.usage.input_tokens || 0);
-        console.log('[ModelRunner] 🟣 Output Tokens:', data.usage.output_tokens || 0);
-        console.log('[ModelRunner] 🟣 Total Tokens:', (data.usage.input_tokens || 0) + (data.usage.output_tokens || 0));
-    }
-    
-    return data.content[0].text;
+    throw new Error(errorMessage);
 }
 
 // Gemini API call
