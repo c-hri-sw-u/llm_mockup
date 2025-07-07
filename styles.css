@@ -1281,4 +1281,16 @@ input:checked + .toggle-slider:before {
         right: 10px;
         max-width: calc(100vw - 20px);
     }
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 30px;
+    background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    z-index: 100;
 } 
