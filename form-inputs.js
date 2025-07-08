@@ -154,6 +154,7 @@ function renderInputItems() {
             </div>
             ${inputElement}
             <div class="present-text">${currentPresent}</div>
+            <div class="websocket-display" id="ws-display-${item.name}">WS: --</div>
         `;
         
         container.appendChild(inputItemDiv);

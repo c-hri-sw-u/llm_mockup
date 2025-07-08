@@ -1293,4 +1293,87 @@ input:checked + .toggle-slider:before {
     background: linear-gradient(to top, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.8) 30%, rgba(255, 255, 255, 0) 100%);
     pointer-events: none;
     z-index: 100;
+}
+
+/* WebSocket toggle button */
+.websocket-toggle-btn {
+    position: fixed;
+    top: 20px;
+    right: 80px; /* Position to the left of LOG button */
+    background-color: #666;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    z-index: 1001;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.2s ease;
+    min-width: 60px;
+    text-align: center;
+}
+
+.websocket-toggle-btn:hover {
+    background-color: #777;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.websocket-toggle-btn.active {
+    background-color: #28a745;
+    color: white;
+}
+
+.websocket-toggle-btn.connecting {
+    background-color: #ffc107;
+    color: #333;
+    animation: pulse-ws 1.5s infinite;
+}
+
+@keyframes pulse-ws {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .websocket-toggle-btn {
+        right: 70px;
+        padding: 6px 10px;
+        font-size: 10px;
+        min-width: 50px;
+    }
+}
+
+/* WebSocket display windows under context items */
+.websocket-display {
+    font-size: 9px;
+    color: #666;
+    background-color: #f5f5f5;
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    padding: 4px 8px;
+    margin-top: 4px;
+    font-family: monospace;
+    transition: all 0.2s ease;
+}
+
+.websocket-display.ws-has-data {
+    background-color: #e8f5e8;
+    border-color: #28a745;
+    color: #155724;
+}
+
+.websocket-display.ws-disabled-item {
+    background-color: #fff3cd;
+    border-color: #ffc107;
+    color: #856404;
+}
+
+.websocket-display.ws-disabled-item::after {
+    content: " (disabled)";
+    font-style: italic;
+    opacity: 0.7;
 } 

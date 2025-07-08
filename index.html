@@ -11,6 +11,9 @@
     <!-- Floating LOG button -->
     <button id="log-toggle-btn" class="log-toggle-btn" onclick="toggleLogPanel()">LOG</button>
     
+    <!-- Floating WebSocket toggle button -->
+    <button id="websocket-toggle-btn" class="websocket-toggle-btn" onclick="webSocketClient?.toggle()">WS: OFF</button>
+    
     <!-- Log panel -->
     <div id="log-panel" class="log-panel">
         <div class="log-panel-header">
@@ -178,6 +181,8 @@
     <script src="voice-input.js"></script>
     <script src="configuration-management.js"></script>
     <script src="log-management.js"></script>
+    <script src="websocket-sift.js"></script>
+    <script src="websocket-client.js"></script>
     
     <!-- Bottom scroll indicator -->
     <div class="scroll-indicator"></div>
